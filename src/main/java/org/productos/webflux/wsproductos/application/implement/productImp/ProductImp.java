@@ -39,8 +39,12 @@ public class ProductImp implements ProductService {
     @Override
     public Mono<ProductDto> save(ProductDto productDto) {
         ProductEntity productEntity = mapperConvert.toEntity(productDto, ProductEntity.class);
+        productEntity.setStatus(StatusEnums.ACTIVE.toString());
         return productRepository.save(productEntity)
-                .map(productSave -> mapperConvert.toDTO(productSave, ProductDto.class));
+                .map(productSave -> {
+                    productDto.setId(productSave.getId());
+                    return mapperConvert.toDTO(productSave, ProductDto.class);
+                });
     }
 
     @Override
