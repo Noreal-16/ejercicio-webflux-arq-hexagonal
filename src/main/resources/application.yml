@@ -1,0 +1,14 @@
+spring:
+  application:
+    name: wsProducts
+  r2dbc:
+    username: postgres
+    password: postgres
+    url: r2dbc:postgresql://localhost:5432/store
+  data:
+    r2dbc:
+      repositories:
+        enabled: true
+
+server:
+  port: 8081
