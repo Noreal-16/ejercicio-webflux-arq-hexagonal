@@ -35,13 +35,13 @@ public class ProductController {
         return productService.save(productDto);
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("/update/{id}")
     @ResponseStatus(HttpStatus.CREATED)
     public Mono<ProductDto> updateProduct(@PathVariable Long id, @RequestBody @Validated ProductDto productDto) {
         return productService.update(productDto, id);
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/delete/{id}")
     @ResponseStatus(HttpStatus.OK)
     public Mono<Void> deleteProduct(@PathVariable Long id) {
         return productService.delete(id);

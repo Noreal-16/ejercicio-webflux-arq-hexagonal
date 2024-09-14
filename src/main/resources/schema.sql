@@ -8,7 +8,7 @@ create table if not exists product (
     create_at   DATE DEFAULT CURRENT_DATE
     );
 
-create table if not exists categories (
+create table if not exists category (
     id      		SERIAL primary key,
     name    		varchar(50) not null ,
     description  	varchar(100),

@@ -25,7 +25,13 @@ public class ProductImp implements ProductService {
     @Override
     public Flux<ProductDto> getAll() {
         return productRepository.findAll()
-                .flatMap(products -> Mono.just(mapperConvert.toDTO(products, ProductDto.class)))
+                .flatMap(products -> {
+                    if (products.getStatus().equals(StatusEnums.ACTIVE.toString())) {
+                        return Mono.just(mapperConvert.toDTO(products, ProductDto.class));
+                    } else {
+                        return Mono.empty();
+                    }
+                })
                 .switchIfEmpty(Flux.empty());
     }
 

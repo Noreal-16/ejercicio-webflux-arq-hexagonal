@@ -3,7 +3,7 @@ spring:
     name: wsProducts
   r2dbc:
     username: postgres
-    password: javacoffe343569
+    password: postgres
     url: r2dbc:postgresql://localhost:5432/store
   data:
     r2dbc:
