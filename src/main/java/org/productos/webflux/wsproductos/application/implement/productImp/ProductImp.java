@@ -25,14 +25,13 @@ public class ProductImp implements ProductService {
     @Override
     public Flux<ProductDto> getAll() {
         return productRepository.findAll()
-                .map(products -> mapperConvert.toDTO(products, ProductDto.class))
+                .flatMap(products -> Mono.just(mapperConvert.toDTO(products, ProductDto.class)))
                 .switchIfEmpty(Flux.empty());
     }
 
     @Override
     public Mono<ProductDto> getById(Long id) {
-        return productRepository.findById(id)
-                .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND, "No se encontró producto por el id: " + id)))
+        return findProductDtoById(id)
                 .map(products -> mapperConvert.toDTO(products, ProductDto.class));
     }
 
@@ -41,16 +40,12 @@ public class ProductImp implements ProductService {
         ProductEntity productEntity = mapperConvert.toEntity(productDto, ProductEntity.class);
         productEntity.setStatus(StatusEnums.ACTIVE.toString());
         return productRepository.save(productEntity)
-                .map(productSave -> {
-                    productDto.setId(productSave.getId());
-                    return mapperConvert.toDTO(productSave, ProductDto.class);
-                });
+                .map(productSave -> mapperConvert.toDTO(productSave, ProductDto.class));
     }
 
     @Override
     public Mono<ProductDto> update(ProductDto productDto, Long id) {
-        return productRepository.findById(id)
-                .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND, "No se encontró producto por el id: " + id)))
+        return findProductDtoById(id)
                 .flatMap(product -> {
                     product.setAmount(productDto.getAmount());
                     product.setName(productDto.getName());
@@ -64,8 +59,7 @@ public class ProductImp implements ProductService {
 
     @Override
     public Mono<Void> delete(Long id) {
-        return productRepository.findById(id)
-                .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND, "No se encontró producto por el id: " + id)))
+        return findProductDtoById(id)
                 .flatMap(productDelete -> {
                     if (productDelete.getStatus().equals(StatusEnums.DELETE.toString())) {
                         return Mono.error(new ResponseStatusException(HttpStatus.BAD_REQUEST, "Error en proceso"));
@@ -73,5 +67,10 @@ public class ProductImp implements ProductService {
                     productDelete.setStatus(StatusEnums.DELETE.toString());
                     return productRepository.save(productDelete).then();
                 });
+    }
+
+    private Mono<ProductEntity> findProductDtoById(Long id) {
+        return productRepository.findById(id)
+                .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND, "No se encontró producto por el id: " + id)));
     }
 }

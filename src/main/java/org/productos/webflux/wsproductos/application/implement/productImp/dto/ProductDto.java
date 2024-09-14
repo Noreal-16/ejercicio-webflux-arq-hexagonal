@@ -9,8 +9,6 @@ import lombok.experimental.FieldDefaults;
 @Data
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class ProductDto {
-
-    Long id;
     @NotNull(message = "name cannot be null")
     @NotBlank(message = "name cannot be empty")
     String name;
